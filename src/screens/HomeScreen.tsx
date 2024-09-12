@@ -1,9 +1,9 @@
-// src/TodoScreen.js
+// src/HomeScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import { getTodos, createTodo, updateTodo, deleteTodo } from '../api/api';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
     const [todos, setTodos] = useState([]);
     const [task, setTask] = useState('');
     const [editId, setEditId] = useState(null);
@@ -31,15 +31,6 @@ export default function HomeScreen() {
         }
     };
 
-    const handleUpdateTodo = async (id, updatedTask) => {
-        try {
-            await updateTodo(id, { task: updatedTask });
-            fetchTodos();
-        } catch (error) {
-            console.error('Error updating todo:', error);
-        }
-    };
-
     const handleDeleteTodo = async (id) => {
         try {
             await deleteTodo(id);
@@ -56,7 +47,10 @@ export default function HomeScreen() {
                 renderItem={({ item }) => (
                     <View style={styles.todoContainer}>
                         <Text>{item.task}</Text>
-                        <Button title="Edit" onPress={() => setEditId(item.id)} />
+                        <Button
+                            title="Edit"
+                            onPress={() => navigation.navigate('EditTodoScreen', { id: item.id })}
+                        />
                         <Button title="Delete" onPress={() => handleDeleteTodo(item.id)} />
                     </View>
                 )}

@@ -14,7 +14,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Drawer.Navigator initialRouteName="Home">
-      <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Screen name="Home" component={HomeScreen} />
         <Drawer.Screen name="Compare" component={CompareScreen} />
         <Drawer.Screen name="Info" component={InfoScreen} />
         <Drawer.Screen name="Chat" component={ChatScreen} />
