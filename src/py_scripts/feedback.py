@@ -44,7 +44,7 @@ def create_feedback():
     category = new_feedback['category']
     description = new_feedback['description']
     conn = get_db_connection()
-    conn.execute('INSERT INTO todos (email, category, description) VALUES (?, ?, ?)', (email, category, description))
+    conn.execute('INSERT INTO feedback (email, category, description) VALUES (?, ?, ?)', (email, category, description))
     conn.commit()
     conn.close()
     return jsonify({'message': 'Feedback recieved'}), 201
