@@ -60,13 +60,37 @@ def create_todo():
 
 @app.route('/todos/<int:id>', methods=['PUT'])
 def update_todo(id):
-    updated_todo = request.get_json()
-    task = updated_todo.get('task')
-    completed = updated_todo.get('completed')
-    starred = updated_todo.get('starred')
-    deleted = updated_todo.get('deleted')
+    data = request.get_json()
+    task = data.get('task')
+    completed = data.get('completed')
+    starred = data.get('starred')
+    deleted = data.get('deleted')
+    
     conn = get_db_connection()
-    conn.execute('UPDATE todos SET task = ?, completed = ?, starred = ?, deleted = ? WHERE id = ?', (task, completed, starred, deleted, id))
+    sql = 'UPDATE todos SET '
+    params = []
+    
+    if task is not None:
+        sql += 'task = ?, '
+        params.append(task)
+    
+    if completed is not None:
+        sql += 'completed = ?, '
+        params.append(completed)
+    
+    if starred is not None:
+        sql += 'starred = ?, '
+        params.append(starred)
+    
+    if deleted is not None:
+        sql += 'deleted = ?, '
+        params.append(deleted)
+    
+    # Remove trailing comma and add WHERE clause
+    sql = sql.rstrip(', ') + ' WHERE id = ?'
+    params.append(id)
+        
+    conn.execute(sql, tuple(params))
     conn.commit()
     conn.close()
     return jsonify({'message': 'Todo updated'})

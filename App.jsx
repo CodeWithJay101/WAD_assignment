@@ -8,6 +8,8 @@ import ChatScreen from './src/screens/ChatScreen';
 import TodoStackNavigator from './src/navigation/TodoStackNavigator';
 import SettingsScreen from './src/screens/SettingsScreen';
 import NotesScreen from './src/screens/NotesScreen';
+import { CompletedTasksScreen, StarredTasksScreen, DeletedTasksScreen } from './src/screens/TaskScreens';
+
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 
 const Drawer = createDrawerNavigator();
@@ -36,6 +38,9 @@ const AppNavigator = () => {
       }}
     >
       <Drawer.Screen name="Home" component={TodoStackNavigator} />
+      <Drawer.Screen name="Completed Tasks" component={CompletedTasksScreen} />
+      <Drawer.Screen name="Starred Tasks" component={StarredTasksScreen} />
+      <Drawer.Screen name="Deleted Tasks" component={DeletedTasksScreen} />
       <Drawer.Screen name="Notes" component={NotesScreen}/>
       <Drawer.Screen name="Chat" component={ChatScreen} />
       <Drawer.Screen name="Feedback" component={FeedbackScreen} />

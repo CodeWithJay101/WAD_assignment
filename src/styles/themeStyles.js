@@ -61,9 +61,9 @@ export const createStyles = (colors) => StyleSheet.create({
     },
     actionsContainer: {
         flexDirection: 'row',
-        alignItems: 'right',
-        justifyContent: 'space-between',
-        width: 80,
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        marginLeft: 10,
     },
     todoBox: {
         flexDirection: 'row',
@@ -74,7 +74,6 @@ export const createStyles = (colors) => StyleSheet.create({
         borderRadius: 8,
         marginBottom: 10,
         backgroundColor: colors.background,
-        justifyContent: 'space-between',
     },
     taskContainer: {
         flex: 1,
@@ -85,7 +84,6 @@ export const createStyles = (colors) => StyleSheet.create({
         color: 'gray',
     },
     textTodo: {
-        marginLeft: -180,
         color: colors.text,
     },
 });

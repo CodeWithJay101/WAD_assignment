@@ -81,7 +81,7 @@ export default function HomeScreen({ navigation }) {
             console.error('Error updating completed status:', error);
         }
     };
-
+    
     const handleToggleStar = async (id, starred) => {
         try {
             await updateTodo(id, { starred: starred ? 0 : 1 });
@@ -101,26 +101,30 @@ export default function HomeScreen({ navigation }) {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, styles.todoContainer]}>
             <FlatList
                 data={todos}
                 renderItem={({ item }) => (
                     <View style={styles.todoBox}>
-                        <TouchableOpacity
-                            onPress={() => handleToggleComplete(item.id, item.completed)}
-                        >
-                            <Icon
-                                name={item.completed ? "check-box" : "check-box-outline-blank"}
-                                size={24}
-                                color={colors.text}
-                            />
-                        </TouchableOpacity>
+                        <View style={styles.completeContainer}>
+                            <TouchableOpacity
+                                onPress={() => handleToggleComplete(item.id, item.completed, item.task)}
+                            >
+                                <Icon
+                                    name={item.completed ? "check-box" : "check-box-outline-blank"}
+                                    size={24}
+                                    color={colors.text}
+                                />
+                            </TouchableOpacity>
+                        </View>
 
-                        <Text style={[ styles.textTodo]}>{item.task}</Text>
+                        <View style={styles.taskContainer}>
+                            <Text style={[ styles.textTodo]}>{item.task}</Text>
+                        </View>
 
                         <View style={styles.actionsContainer}>
                             {/* Mark as deleted */}
-                            <TouchableOpacity onPress={() => handleToggleDelete(item.id, item.deleted)}>
+                            <TouchableOpacity onPress={() => handleToggleDelete(item.id, item.deleted, item.task)}>
                                 <Icon
                                     name="delete"
                                     size={24}
@@ -134,7 +138,7 @@ export default function HomeScreen({ navigation }) {
                             </TouchableOpacity>
 
                             {/* Toggle starred */}
-                            <TouchableOpacity onPress={() => handleToggleStar(item.id, item.starred)}>
+                            <TouchableOpacity onPress={() => handleToggleStar(item.id, item.starred, item.task)}>
                                 <Icon
                                     name={item.starred ? "star" : "star-border"}
                                     size={24}
