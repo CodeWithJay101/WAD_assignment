@@ -14,15 +14,12 @@ const TodoStackNavigator = () => {
 
   return (
     <Stack.Navigator 
-      initialRouteName="Home"
+      initialRouteName="ToDo"
       screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.header,
-        },
-        headerTintColor: colors.text,
+        headerShown: false
       }}
     >
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="ToDo" component={HomeScreen} />
       <Stack.Screen name="EditTodoScreen" component={EditTodoScreen} />
     </Stack.Navigator>
   )
