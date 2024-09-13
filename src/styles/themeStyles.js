@@ -15,10 +15,36 @@ export const createStyles = (colors) => StyleSheet.create({
         backgroundColor: colors.header,
     },
     input: {
-        borderColor: colors.text,
+        borderColor: 'black',
+        borderWidth: 1,
+        borderRadius: 10,
+        color: colors.text,
+        marginBottom: 10,
+    },
+    dropdown: {
+        borderColor: 'gray',
+    },
+    textArea: {
         color: colors.text,
     },
-    todoContainer: {
+    errorInput: {
+        borderColor: 'red',
+    },
+    errorText: {
+        color: 'red',
         marginBottom: 10,
+    },
+    label: {
+        color: colors.text,
+        marginBottom: 5,
+    },
+    textArea: {
+        marginBottom: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: colors.text,
     },
 });

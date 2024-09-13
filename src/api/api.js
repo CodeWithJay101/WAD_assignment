@@ -92,3 +92,42 @@ export const deleteTodo = async (id) => {
         throw error;
     }
 };
+
+// Create Feedback
+export const createFeedback = async (feedback) => {
+    try {
+        const response = await fetch(`${API_URL}:${FEEDBACK_PORT}/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(feedback),
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error creating feedback:', error);
+        throw error;
+    }
+}
+
+// Get Feedbacks
+export const getFeedbacks = async () => {
+    try {
+        const response = await fetch(`${API_URL}:${FEEDBACK_PORT}/feedback`);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        // Attempt to parse the JSON
+        const data = await response.json();
+        console.log('Fetched feedbacks:', data);
+        return data;
+    } catch (error) {
+        console.error('Error fetching todos:', error);
+        throw error;
+    }
+};

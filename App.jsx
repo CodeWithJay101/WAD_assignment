@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import CompareScreen from './src/screens/CompareScreen';
-import InfoScreen from './src/screens/InfoScreen';
+import FeedbackScreen from './src/screens/FeedbackScreen';
+import FeedbackListingScreen from './src/screens/FeedbackListScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import TodoStackNavigator from './src/navigation/TodoStackNavigator';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -35,8 +35,8 @@ const AppNavigator = () => {
       }}
     >
       <Drawer.Screen name="Home" component={TodoStackNavigator} />
-      <Drawer.Screen name="Compare" component={CompareScreen} />
-      <Drawer.Screen name="Info" component={InfoScreen} />
+      <Drawer.Screen name="Feedback" component={FeedbackScreen} />
+      <Drawer.Screen name="Feedback Listing" component={FeedbackListingScreen} />
       <Drawer.Screen name="Chat" component={ChatScreen} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
     </Drawer.Navigator>
