@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import io from 'socket.io-client';
 
-const socket = io('http://192.168.1.9:5000'); // Your Flask server address
+const socket = io('http://192.168.125.220:5000'); // Your Flask server address
 
 export default function ChatScreen() {
-    const [messages, setMessages] = useState<string[]>([]);
+    const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
 
     useEffect(() => {

@@ -1,6 +1,8 @@
 // src/HomeScreen.js
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { getTodos, createTodo, updateTodo, deleteTodo } from '../api/api';
 
 export default function HomeScreen({ navigation }) {
@@ -8,13 +10,16 @@ export default function HomeScreen({ navigation }) {
     const [task, setTask] = useState('');
     const [editId, setEditId] = useState(null);
 
-    useEffect(() => {
-        fetchTodos();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchTodos();
+        }, [])
+    );
 
     const fetchTodos = async () => {
         try {
             const todos = await getTodos();
+            console.log('Fetched todos:', todos); //debug
             setTodos(todos);
         } catch (error) {
             console.error('Error fetching todos:', error);
@@ -31,6 +36,22 @@ export default function HomeScreen({ navigation }) {
         }
     };
 
+    const handleUpdateTodo = async () => {
+        if (!task.trim()) {
+            Alert.alert('Error', 'Task cannot be empty');
+            return;
+        }
+        if (editId === null) return;
+        try {
+            await updateTodo(editId, { task });
+            setTask('');
+            setEditId(null); // Clear edit state
+            fetchTodos();
+        } catch (error) {
+            console.error('Error updating todo:', error);
+        }
+    };
+
     const handleDeleteTodo = async (id) => {
         try {
             await deleteTodo(id);
@@ -38,6 +59,11 @@ export default function HomeScreen({ navigation }) {
         } catch (error) {
             console.error('Error deleting todo:', error);
         }
+    };
+
+    const handleEditTodo = (id, task) => {
+        setEditId(id);
+        setTask(task);
     };
 
     return (
