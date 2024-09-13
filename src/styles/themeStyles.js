@@ -9,6 +9,7 @@ export const createStyles = (colors) => StyleSheet.create({
     },
     text: {
         color: colors.text,
+        textAlign: 'left',
     },
     header: {
         color: colors.text,
@@ -56,6 +57,35 @@ export const createStyles = (colors) => StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 8,
         textAlignVertical: 'top', // Ensures text starts at the top of the TextInput
+        color: colors.text,
+    },
+    actionsContainer: {
+        flexDirection: 'row',
+        alignItems: 'right',
+        justifyContent: 'space-between',
+        width: 80,
+    },
+    todoBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 8,
+        marginBottom: 10,
+        backgroundColor: colors.background,
+        justifyContent: 'space-between',
+    },
+    taskContainer: {
+        flex: 1,
+        marginLeft: 10,
+    },
+    completedTask: {
+        textDecorationLine: 'line-through', // Strike-through for completed tasks
+        color: 'gray',
+    },
+    textTodo: {
+        marginLeft: -180,
         color: colors.text,
     },
 });

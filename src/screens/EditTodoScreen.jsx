@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { createStyles } from '../styles/themeStyles';
 import { getTodo, updateTodo } from '../api/api';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import icon library
 
 export default function EditTodoScreen({ navigation }) {
     const { colors } = useTheme();
@@ -13,12 +14,18 @@ export default function EditTodoScreen({ navigation }) {
     const { id } = route.params; // Get the todo ID from route params
     const [task, setTask] = useState('');
 
+    const [originalCompleted, setOriginalCompleted] = useState(null);
+    const [originalStarred, setOriginalStarred] = useState(null);
+    const [originalDeleted, setOriginalDeleted] = useState(null);
+
     useEffect(() => {
-        // Fetch the todo details when the component mounts
         const fetchTodo = async () => {
             try {
                 const todo = await getTodo(id);
                 setTask(todo.task);
+                setOriginalCompleted(todo.completed);
+                setOriginalStarred(todo.starred);
+                setOriginalDeleted(todo.deleted);
             } catch (error) {
                 console.error('Error fetching todo:', error);
                 Alert.alert('Error', 'Failed to load todo');
@@ -36,7 +43,9 @@ export default function EditTodoScreen({ navigation }) {
         try {
             await updateTodo(id, { 
                 "task": task,
-                "completed": true
+                "completed": originalCompleted,  // Preserve the original completed state
+                "starred": originalStarred,      // Preserve the original starred state
+                "deleted": originalDeleted       // Preserve the original deleted state
             });
             navigation.goBack(); // Navigate back to the previous screen after updating
         } catch (error) {
@@ -47,6 +56,13 @@ export default function EditTodoScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
+            <Icon 
+                name="arrow-back" 
+                size={24} 
+                color={colors.text} 
+                onPress={() => navigation.goBack()} 
+                style={styles.backIcon}
+            />
             <Text style={styles.text}>Edit Todo</Text>
             <TextInput
                 style={styles.input}

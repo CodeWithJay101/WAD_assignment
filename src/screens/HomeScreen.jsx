@@ -1,11 +1,11 @@
 // src/HomeScreen.js
 import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { createStyles } from '../styles/themeStyles';
 import { getTodos, createTodo, updateTodo, deleteTodo } from '../api/api';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
 
 export default function HomeScreen({ navigation }) {
     const { colors } = useTheme();
@@ -24,8 +24,10 @@ export default function HomeScreen({ navigation }) {
     const fetchTodos = async () => {
         try {
             const todos = await getTodos();
+            // Filter out completed and deleted tasks
+            const filteredTodos = todos.filter(todo => !todo.completed && !todo.deleted);
             console.log('Fetched todos:', todos); //debug
-            setTodos(todos);
+            setTodos(filteredTodos);
         } catch (error) {
             console.error('Error fetching todos:', error);
         }
@@ -33,7 +35,7 @@ export default function HomeScreen({ navigation }) {
 
     const handleAddTodo = async () => {
         try {
-            await createTodo({ task });
+            await createTodo({ task, completed: 0, starred: 0, deleted: 0 });
             setTask('');
             fetchTodos();
         } catch (error) {
@@ -41,14 +43,14 @@ export default function HomeScreen({ navigation }) {
         }
     };
 
-    const handleUpdateTodo = async () => {
+    const handleUpdateTodo = async (id, updates) => {
         if (!task.trim()) {
             Alert.alert('Error', 'Task cannot be empty');
             return;
         }
         if (editId === null) return;
         try {
-            await updateTodo(editId, { task });
+            await updateTodo(id, updates);
             setTask('');
             setEditId(null); // Clear edit state
             fetchTodos();
@@ -71,18 +73,75 @@ export default function HomeScreen({ navigation }) {
         setTask(task);
     };
 
+    const handleToggleComplete = async (id, completed) => {
+        try {
+            await updateTodo(id, { completed: completed ? 0 : 1 });
+            fetchTodos();
+        } catch (error) {
+            console.error('Error updating completed status:', error);
+        }
+    };
+
+    const handleToggleStar = async (id, starred) => {
+        try {
+            await updateTodo(id, { starred: starred ? 0 : 1 });
+            fetchTodos();
+        } catch (error) {
+            console.error('Error updating starred status:', error);
+        }
+    };
+
+    const handleToggleDelete = async (id, deleted) => {
+        try {
+            await updateTodo(id, { deleted: deleted ? 0 : 1 });
+            fetchTodos();
+        } catch (error) {
+            console.error('Error updating deleted status:', error);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <FlatList
                 data={todos}
                 renderItem={({ item }) => (
-                    <View style={styles.todoContainer}>
-                        <Text style={styles.text}>{item.task}</Text>
-                        <Button
-                            title="Edit"
-                            onPress={() => navigation.navigate('EditTodoScreen', { id: item.id })}
-                        />
-                        <Button title="Delete" onPress={() => handleDeleteTodo(item.id)} />
+                    <View style={styles.todoBox}>
+                        <TouchableOpacity
+                            onPress={() => handleToggleComplete(item.id, item.completed)}
+                        >
+                            <Icon
+                                name={item.completed ? "check-box" : "check-box-outline-blank"}
+                                size={24}
+                                color={colors.text}
+                            />
+                        </TouchableOpacity>
+
+                        <Text style={[ styles.textTodo]}>{item.task}</Text>
+
+                        <View style={styles.actionsContainer}>
+                            {/* Mark as deleted */}
+                            <TouchableOpacity onPress={() => handleToggleDelete(item.id, item.deleted)}>
+                                <Icon
+                                    name="delete"
+                                    size={24}
+                                    color={colors.text}
+                                />
+                            </TouchableOpacity>
+
+                            {/* Edit task */}
+                            <TouchableOpacity onPress={() => navigation.navigate('EditTodoScreen', { id: item.id })}>
+                                <Icon name="edit" size={24} color={colors.text} />
+                            </TouchableOpacity>
+
+                            {/* Toggle starred */}
+                            <TouchableOpacity onPress={() => handleToggleStar(item.id, item.starred)}>
+                                <Icon
+                                    name={item.starred ? "star" : "star-border"}
+                                    size={24}
+                                    color={colors.text}
+                                />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 )}
                 keyExtractor={(item) => item.id.toString()}
@@ -98,20 +157,3 @@ export default function HomeScreen({ navigation }) {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10,
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingHorizontal: 8,
-    },
-    todoContainer: {
-        marginBottom: 10,
-    },
-});
