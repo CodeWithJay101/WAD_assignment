@@ -1,8 +1,6 @@
-# app.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
-import os
 
 app = Flask(__name__)
 CORS(app)
@@ -21,14 +19,17 @@ def init_db():
         CREATE TABLE IF NOT EXISTS todos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             task TEXT NOT NULL,
-            completed BOOLEAN NOT NULL DEFAULT 0
+            completed BOOLEAN NOT NULL DEFAULT 0,
+            starred BOOLEAN NOT NULL DEFAULT 0,
+            deleted BOOLEAN NOT NULL DEFAULT 0,
+            deleted_date DATETIME,
+            list_id INTEGER
         );
     ''')
     conn.commit()
     conn.close()
     print("Database created and schema initialized.")
 
-# Initialize the database schema
 init_db()
 
 @app.route('/todos', methods=['GET'])
@@ -51,9 +52,8 @@ def get_todo(id):
 def create_todo():
     new_todo = request.get_json()
     task = new_todo['task']
-    completed = new_todo.get('completed', False)
     conn = get_db_connection()
-    conn.execute('INSERT INTO todos (task, completed) VALUES (?, ?)', (task, completed))
+    conn.execute('INSERT INTO todos (task) VALUES (?)', (task,))
     conn.commit()
     conn.close()
     return jsonify({'message': 'Todo created'}), 201
@@ -63,8 +63,10 @@ def update_todo(id):
     updated_todo = request.get_json()
     task = updated_todo.get('task')
     completed = updated_todo.get('completed')
+    starred = updated_todo.get('starred')
+    deleted = updated_todo.get('deleted')
     conn = get_db_connection()
-    conn.execute('UPDATE todos SET task = ?, completed = ? WHERE id = ?', (task, completed, id))
+    conn.execute('UPDATE todos SET task = ?, completed = ?, starred = ?, deleted = ? WHERE id = ?', (task, completed, starred, deleted, id))
     conn.commit()
     conn.close()
     return jsonify({'message': 'Todo updated'})
@@ -78,4 +80,4 @@ def delete_todo(id):
     return jsonify({'message': 'Todo deleted'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=3333)
