@@ -1,11 +1,16 @@
 // src/HomeScreen.js
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../contexts/ThemeContext';
+import { createStyles } from '../styles/themeStyles';
 import { getTodos, createTodo, updateTodo, deleteTodo } from '../api/api';
 
 export default function HomeScreen({ navigation }) {
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
+
     const [todos, setTodos] = useState([]);
     const [task, setTask] = useState('');
     const [editId, setEditId] = useState(null);
@@ -72,7 +77,7 @@ export default function HomeScreen({ navigation }) {
                 data={todos}
                 renderItem={({ item }) => (
                     <View style={styles.todoContainer}>
-                        <Text>{item.task}</Text>
+                        <Text style={styles.text}>{item.task}</Text>
                         <Button
                             title="Edit"
                             onPress={() => navigation.navigate('EditTodoScreen', { id: item.id })}
@@ -87,6 +92,7 @@ export default function HomeScreen({ navigation }) {
                 value={task}
                 onChangeText={setTask}
                 placeholder="New task"
+                placeholderTextColor={colors.text}
             />
             <Button title="Add Task" onPress={handleAddTodo} />
         </View>
