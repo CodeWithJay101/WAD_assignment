@@ -1,11 +1,16 @@
 // src/ChatScreen.js
 import React, { useEffect, useState } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
+import { createStyles } from '../styles/themeStyles';
+
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import io from 'socket.io-client';
 
 const socket = io('http://192.168.125.220:5000'); // Your Flask server address
 
 export default function ChatScreen() {
+    const { colors, toggleTheme } = useTheme();
+    const styles = createStyles(colors);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
 
@@ -32,10 +37,11 @@ export default function ChatScreen() {
                 keyExtractor={(item, index) => index.toString()}
             />
             <TextInput
-                style={styles.input}
+                style={styles.text}
                 value={message}
                 onChangeText={setMessage}
                 placeholder="Type a message"
+                placeholderTextColor={colors.text}
             />
             <Button title="Send" onPress={sendMessage} />
         </View>

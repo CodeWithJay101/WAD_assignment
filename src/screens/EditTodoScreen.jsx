@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
+import { useTheme } from '../contexts/ThemeContext';
+import { createStyles } from '../styles/themeStyles';
 import { getTodo, updateTodo } from '../api/api';
 
 export default function EditTodoScreen({ navigation }) {
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
+
     const route = useRoute(); // Get route object from the hook
     const { id } = route.params; // Get the todo ID from route params
     const [task, setTask] = useState('');
@@ -42,12 +47,13 @@ export default function EditTodoScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Edit Todo</Text>
+            <Text style={styles.text}>Edit Todo</Text>
             <TextInput
                 style={styles.input}
                 value={task}
                 onChangeText={setTask}
                 placeholder="Update task"
+                placeholderTextColor={colors.text}
             />
             <Button title="Update Task" onPress={handleUpdateTodo} />
         </View>
