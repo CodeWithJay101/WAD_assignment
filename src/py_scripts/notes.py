@@ -17,9 +17,12 @@ def init_db():
     cursor = conn.cursor()
     cursor.executescript('''
         CREATE TABLE IF NOT EXISTS notes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            id INTEGER PRIMARY KEY, 
             note TEXT
         );
+        -- Ensure only one row
+        DELETE FROM notes;
+        INSERT INTO notes (id, note) VALUES (1, ''); 
     ''')
     conn.commit()
     conn.close()
@@ -30,16 +33,19 @@ init_db()
 @app.route('/note', methods=['GET'])
 def get_note():
     conn = get_db_connection()
-    notes = conn.execute('SELECT * FROM notes').fetchall()
+    note = conn.execute('SELECT * FROM notes WHERE id = 1').fetchone()
     conn.close()
-    return jsonify([dict(note) for note in notes])
+    if note:
+        return jsonify(dict(note))
+    else:
+        return jsonify({'message': 'Note not found'}), 404
 
 @app.route('/note', methods=['POST'])
 def create_note():
     new_note = request.get_json()
     note = new_note.get('note')
     conn = get_db_connection()
-    conn.execute('INSERT INTO notes (note) VALUES (?)', (note,))
+    conn.execute('INSERT OR REPLACE INTO notes (id, note) VALUES (1, ?)', (note,))
     conn.commit()
     conn.close()
     return jsonify({'message': 'Note created'}), 201

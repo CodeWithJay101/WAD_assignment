@@ -131,3 +131,56 @@ export const getFeedbacks = async () => {
         throw error;
     }
 };
+
+export const getNote = async () => {
+    try {
+        const response = await fetch(`${API_URL}:${NOTE_PORT}/note`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Fetched note:', data);
+        return data;
+    } catch (error) {
+        console.error('Error fetching note:', error);
+        throw error;
+    }
+};
+
+export const createNote = async (note) => {
+    try {
+        const response = await fetch(`${API_URL}:${NOTE_PORT}/note`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ note }),
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error creating note:', error);
+        throw error;
+    }
+};
+
+export const updateNote = async (note) => {
+    try {
+        const response = await fetch(`${API_URL}:${NOTE_PORT}/note`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ note }),
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error updating note:', error);
+        throw error;
+    }
+};

@@ -47,4 +47,15 @@ export const createStyles = (colors) => StyleSheet.create({
         marginBottom: 20,
         color: colors.text,
     },
+    noteInput: {
+        flex: 1, // Makes the input expand to fill the available space
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 8,
+        marginBottom: 10,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+        textAlignVertical: 'top', // Ensures text starts at the top of the TextInput
+        color: colors.text,
+    },
 });

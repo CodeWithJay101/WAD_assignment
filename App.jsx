@@ -7,6 +7,7 @@ import FeedbackListingScreen from './src/screens/FeedbackListScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import TodoStackNavigator from './src/navigation/TodoStackNavigator';
 import SettingsScreen from './src/screens/SettingsScreen';
+import NotesScreen from './src/screens/NotesScreen';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 
 const Drawer = createDrawerNavigator();
@@ -35,9 +36,10 @@ const AppNavigator = () => {
       }}
     >
       <Drawer.Screen name="Home" component={TodoStackNavigator} />
+      <Drawer.Screen name="Notes" component={NotesScreen}/>
+      <Drawer.Screen name="Chat" component={ChatScreen} />
       <Drawer.Screen name="Feedback" component={FeedbackScreen} />
       <Drawer.Screen name="Feedback Listing" component={FeedbackListingScreen} />
-      <Drawer.Screen name="Chat" component={ChatScreen} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
     </Drawer.Navigator>
   );
