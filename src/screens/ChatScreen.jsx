@@ -1,73 +1,93 @@
-// src/ChatScreen.js
-import React, { useEffect, useState } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { createStyles } from '../styles/themeStyles';
-import ChatBubble from 'react-native-chat-bubble';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  ScrollView,
+  View,
+  Button,
+} from 'react-native';
 import io from 'socket.io-client';
+import { createStyles } from '../styles/themeStyles';
+import { useTheme } from '../contexts/ThemeContext';
 
-const socket = io('http://192.168.1.9:5000'); // Your Flask server address
+var socket = io('http://10.0.2.2:5000/chat', {
+    transports: ['websocket'],
+});
 
-export default function ChatScreen() {
-    const { colors, toggleTheme } = useTheme();
+
+const App = () => {
+
+  const [name, setName] = useState('');
+  const [message, setMessage] = useState('');
+    const [chatroom, setChatroom] = useState('');
+    const { colors } = useTheme();
     const styles = createStyles(colors);
-    const [messages, setMessages] = useState([]);
-    const [message, setMessage] = useState('');
 
-    useEffect(() => {
-        socket.on('message', (message) => {
-            setMessages((prevMessages) => [...prevMessages, message]);
-        });
+  useEffect(()=>{
+    // When connected, emit a message to the server to inform that this client has connected to the server.
+    // Display a Toast to inform user that connection was made.
+    socket.on('connect', () => {
 
-        return () => {
-            socket.off('message');
-        };
-    }, []);
+      console.log(socket.id); // undefined
+      socket.emit('mobile_client_connected', {connected: true}, (response)=>{
+        console.log(response)
+      });
+      ToastAndroid.show('Connected to server', ToastAndroid.LONG);
+    });
 
-    const sendMessage = () => {
-        socket.emit('message', message);
-        setMessage('');
-    };
+    socket.on('connect_to_client', (data) => {
+      let greets=JSON.parse(data)
+      console.log(greets)
+    });
+
+    // Handle connection error
+    socket.on('error', (error) => {
+        ToastAndroid.show('Failed to connect to server', ToastAndroid.LONG);
+    });
+
+    // Receive chat broadcast from server.
+    socket.on('message_broadcast', (data) => {
+      console.log(data);
+      let messageBag = JSON.parse(data);
+
+      setChatroom(chatroom => chatroom + `Message from ${messageBag.sender} at ${messageBag.timestamp}: \n${messageBag.message}\n\n`);
+    });
+  },[]);
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={messages}
-                renderItem={({ item }) =>
-                    <ChatBubble
-                        isOwnMessage={true}
-                        bubbleColor='#1084ff'
-                        tailColor='#1084ff'
-                        withTail={true}
-                        onPress={() => console.log("Bubble Pressed!")}
-                    >
-                        <Text style={ styles.text}>{item}</Text>
-                    </ChatBubble>
-                }
-                keyExtractor={(item, index) => index.toString()}
-            />
             <TextInput
-                style={styles.text}
-                value={message}
-                onChangeText={setMessage}
-                placeholder="Type a message"
-                placeholderTextColor={colors.text}
+                style={styles.input}
+                placeholder="Enter name"
+                value={name}
+                selectTextOnFocus={true}
+                onChangeText={(name) => { setName(name) }}
             />
-            <Button title="Send" onPress={sendMessage} />
+            <ScrollView>
+                <Text style={styles.text}>{ chatroom }</Text>
+            </ScrollView>
+            <TextInput
+                style={styles.input}
+                placeholder="Enter message"
+                value={message}
+                selectTextOnFocus={true}
+                onChangeText={(message) => { setMessage(message) }}
+            />
+            <Button
+                title="Send"
+                onPress={() => {
+                    socket.emit('message_sent', {
+                        sender: name,
+                        message: message,
+                    })
+                }} />
+      
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10,
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingHorizontal: 8,
-    },
-});
+
+export default App;
