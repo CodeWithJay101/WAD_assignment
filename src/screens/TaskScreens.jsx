@@ -86,25 +86,25 @@ const TaskListScreen = ({ filter, title }) => {
 
     return (
         <View style={styles.container}>
-             <View>
+             {/* <View>
                 <TouchableOpacity onPress={handleBackPress}>
                     <Icon name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
             </View>
-            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.title}>{title}</Text> */}
             <FlatList
                 data={filteredTodos}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
             />
-            <TextInput
+            {/* <TextInput
                 style={styles.input}
                 value={task}
                 onChangeText={setTask}
                 placeholder="New task"
                 placeholderTextColor={colors.text}
             />
-            <Button title="Add Task" onPress={handleAddTodo} />
+            <Button title="Add Task" onPress={handleAddTodo} /> */}
         </View>
     );
 };
