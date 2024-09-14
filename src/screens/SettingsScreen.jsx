@@ -1,16 +1,10 @@
-// src/screens/SettingsScreen.js
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
-import { createStyles } from '../styles/themeStyles';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function SettingsScreen() {
     const { colors, toggleTheme } = useTheme();
-    const styles = createStyles(colors);
-
-    console.log('Current theme colors:', colors); // Debugging line
-
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(colors.background === '#ffffff' ? 'light' : 'dark');
     const [items, setItems] = useState([
@@ -24,8 +18,8 @@ export default function SettingsScreen() {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>Settings Screen</Text>
+        <View style={styles.container(colors)}>
+            <Text style={styles.text(colors)}>Settings Screen</Text>
             <DropDownPicker
                 open={open}
                 value={value}
@@ -33,7 +27,10 @@ export default function SettingsScreen() {
                 setOpen={setOpen}
                 setValue={setValue}
                 setItems={setItems}
-                style={{ backgroundColor: colors.button, borderColor: colors.button }}
+                style={{
+                    backgroundColor: colors.button,
+                    borderColor: colors.button,
+                }}
                 textStyle={{ color: colors.text }}
                 dropDownContainerStyle={{ backgroundColor: colors.background }}
                 onChangeValue={(theme) => {
@@ -44,3 +41,15 @@ export default function SettingsScreen() {
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: (colors) => ({
+        flex: 1,
+        padding: 10,
+        backgroundColor: colors.background,
+    }),
+    text: (colors) => ({
+        color: colors.text,
+        textAlign: 'left',
+    }),
+});
