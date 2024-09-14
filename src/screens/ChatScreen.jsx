@@ -72,7 +72,7 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.nameText}>Name: {name}</Text>
+      <Text style={styles.text}>Name: {name}</Text>
 
       <ScrollView>
         <Text style={styles.text}>{chatroom}</Text>
