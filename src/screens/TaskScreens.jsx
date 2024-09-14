@@ -1,7 +1,7 @@
 // src/screens/TaskScreens.js
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { useFocusEffect, useRoute } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { createStyles } from '../styles/themeStyles';
 import { getTodos, createTodo, updateTodo, deleteTodo } from '../api/api';
@@ -10,6 +10,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon l
 const TaskListScreen = ({ filter, title }) => {
     const { colors } = useTheme();
     const styles = createStyles(colors);
+    const navigation = useNavigation();
 
     const [todos, setTodos] = useState([]);
     const [task, setTask] = useState('');
@@ -79,8 +80,17 @@ const TaskListScreen = ({ filter, title }) => {
 
     const filteredTodos = todos.filter(filter);
 
+    const handleBackPress = () => {
+        navigation.goBack();
+    };
+
     return (
         <View style={styles.container}>
+             <View>
+                <TouchableOpacity onPress={handleBackPress}>
+                    <Icon name="arrow-back" size={24} color={colors.text} />
+                </TouchableOpacity>
+            </View>
             <Text style={styles.title}>{title}</Text>
             <FlatList
                 data={filteredTodos}

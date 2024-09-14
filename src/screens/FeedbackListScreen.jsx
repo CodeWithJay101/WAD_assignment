@@ -1,6 +1,6 @@
 // src/screens/FeedbackListScreen.js
 import React, { useCallback, useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, Alert, TextInput, Button } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { getFeedbacks } from '../api/api';
@@ -20,6 +20,10 @@ export default function FeedbackListing() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
     useFocusEffect(
         useCallback(() => {
             const fetchFeedbacks = async () => {
@@ -36,8 +40,22 @@ export default function FeedbackListing() {
             };
 
             fetchFeedbacks();
-        }, [])
+        }, [isAuthenticated])
     );
+
+    const handleLogin = () => {
+        if (username === 'admin' && password === 'admin') {
+            setIsAuthenticated(true);
+        } else {
+            Alert.alert('Authentication failed', 'Only Admins can view this page.');
+        }
+    };
+
+    const handleLogout = () => {
+        setIsAuthenticated(false);
+        setUsername('');
+        setPassword('');
+    };
 
     const renderFeedbackItem = ({ item }) => (
         <View style={styles.container}>
@@ -46,6 +64,30 @@ export default function FeedbackListing() {
             <Text style={styles.label}>Description: {item.description}</Text>
         </View>
     );
+
+    if (!isAuthenticated) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.title}>Admins Only</Text>
+                <TextInput
+                    style={styles.input}
+                    value={username}
+                    onChangeText={setUsername}
+                    placeholder="Username"
+                    placeholderTextColor={colors.text}
+                />
+                <TextInput
+                    style={styles.input}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Password"
+                    secureTextEntry
+                    placeholderTextColor={colors.text}
+                />
+                <Button title="Login" onPress={handleLogin} />
+            </View>
+        );
+    }
 
     if (loading) {
         return <ActivityIndicator size="large" color={colors.text}/>;
@@ -67,6 +109,10 @@ export default function FeedbackListing() {
                 renderItem={renderFeedbackItem}
                 keyExtractor={(item) => item.id.toString()}
             />
+        
+            <View style={styles.footer}>
+                <Button title="Logout" onPress={handleLogout} />
+            </View>
         </View>
     );
 }
