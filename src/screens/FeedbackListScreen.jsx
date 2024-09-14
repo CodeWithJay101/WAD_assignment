@@ -94,7 +94,7 @@ export default function FeedbackListing() {
                     secureTextEntry
                     placeholderTextColor={colors.text}
                 />
-                <Button title="Login" onPress={handleLogin} />
+                <Button title="Login" onPress={handleLogin} color = "blue"/>
             </View>
         );
     }
@@ -106,7 +106,7 @@ export default function FeedbackListing() {
     if (error) {
         return (
             <View style={styles.container}>
-                <Text style={styles.errorText}>{error}</Text>
+                <Text style={stylesInter.error.color}>{error}</Text>
             </View>
         );
     }
@@ -127,7 +127,7 @@ export default function FeedbackListing() {
     );
 }
 
-const styles = StyleSheet.create({
+const stylesInter = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
@@ -160,4 +160,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 20,
     },
+    text: {
+        color: 'black',
+    }
 });
