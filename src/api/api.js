@@ -1,7 +1,6 @@
 // src/api.js
 const API_URL = 'http://10.0.2.2'; // Replace with your Flask server URL
 const TODO_PORT = 3333
-const LIST_PORT = 3344
 const FEEDBACK_PORT = 4444
 const NOTE_PORT = 6000
 
