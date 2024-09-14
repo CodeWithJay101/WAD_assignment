@@ -1,15 +1,16 @@
-// src/screens/HomeScreen.js
 import React, { useCallback, useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
-import { getTodos, deleteTodo } from '../api/api';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
+import { getTodos, createTodo, updateTodo, deleteTodo } from '../api/api';
 
 export default function HomeScreen({ navigation }) {
     const { colors } = useTheme();
-    const styles = createStyles(colors);
 
     const [todos, setTodos] = useState([]);
+    const [task, setTask] = useState('');
+    const [editId, setEditId] = useState(null);
 
     useFocusEffect(
         useCallback(() => {
@@ -20,9 +21,41 @@ export default function HomeScreen({ navigation }) {
     const fetchTodos = async () => {
         try {
             const todos = await getTodos();
-            setTodos(todos);
+            const filteredTodos = todos.filter(todo => !todo.completed && !todo.deleted);
+            console.log('Fetched todos:', todos); //debug
+            setTodos(filteredTodos);
         } catch (error) {
             console.error('Error fetching todos:', error);
+        }
+    };
+
+    const handleAddTodo = async () => {
+        if (!task.trim()) {
+            Alert.alert('Error', 'Task cannot be empty');
+            return;
+        }
+        try {
+            await createTodo({ task, completed: 0, starred: 0, deleted: 0 });
+            setTask('');
+            fetchTodos();
+        } catch (error) {
+            console.error('Error adding todo:', error);
+        }
+    };
+
+    const handleUpdateTodo = async (id, updates) => {
+        if (!task.trim()) {
+            Alert.alert('Error', 'Task cannot be empty');
+            return;
+        }
+        if (editId === null) return;
+        try {
+            await updateTodo(id, updates);
+            setTask('');
+            setEditId(null); // Clear edit state
+            fetchTodos();
+        } catch (error) {
+            console.error('Error updating todo:', error);
         }
     };
 
@@ -35,39 +68,131 @@ export default function HomeScreen({ navigation }) {
         }
     };
 
+    const handleEditTodo = (id, task) => {
+        setEditId(id);
+        setTask(task);
+    };
+
+    const handleToggleComplete = async (id, completed) => {
+        try {
+            await updateTodo(id, { completed: completed ? 0 : 1 });
+            fetchTodos();
+        } catch (error) {
+            console.error('Error updating completed status:', error);
+        }
+    };
+
+    const handleToggleStar = async (id, starred) => {
+        try {
+            await updateTodo(id, { starred: starred ? 0 : 1 });
+            fetchTodos();
+        } catch (error) {
+            console.error('Error updating starred status:', error);
+        }
+    };
+
+    const handleToggleDelete = async (id, deleted) => {
+        try {
+            await updateTodo(id, { deleted: deleted ? 0 : 1 });
+            fetchTodos();
+        } catch (error) {
+            console.error('Error updating deleted status:', error);
+        }
+    };
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, styles.todoContainer]}>
             <FlatList
                 data={todos}
                 renderItem={({ item }) => (
-                    <View style={styles.todoContainer}>
-                        <Text style={styles.text}>{item.task}</Text>
-                        <Button
-                            title="Edit"
-                            onPress={() => navigation.navigate('EditTodo', { id: item.id })}
-                        />
-                        <Button title="Delete" onPress={() => handleDeleteTodo(item.id)} />
+                    <View style={styles.todoBox}>
+                        <View style={styles.completeContainer}>
+                            <TouchableOpacity onPress={() => handleToggleComplete(item.id, item.completed, item.task)}>
+                                <Icon name={item.completed ? "check-box" : "check-box-outline-blank"} size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.taskContainer}>
+                            <Text style={styles.textTodo}>{item.task}</Text>
+                        </View>
+
+                        <View style={styles.actionsContainer}>
+                            {/* Mark as deleted */}
+                            <TouchableOpacity onPress={() => handleToggleDelete(item.id, item.deleted, item.task)}>
+                                <Icon name="delete" size={24} color={colors.text} />
+                            </TouchableOpacity>
+
+                            {/* Edit task */}
+                            <TouchableOpacity onPress={() => navigation.navigate('EditTodoScreen', { id: item.id })}>
+                                <Icon name="edit" size={24} color={colors.text} />
+                            </TouchableOpacity>
+
+                            {/* Toggle starred */}
+                            <TouchableOpacity onPress={() => handleToggleStar(item.id, item.starred, item.task)}>
+                                <Icon name={item.starred ? "star" : "star-border"} size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 )}
                 keyExtractor={(item) => item.id.toString()}
             />
-            {/* Button to navigate to AddTodoScreen */}
-            <Button title="Add New Task" onPress={() => navigation.navigate('AddTodo')} />
+            <TextInput
+                style={styles.input}
+                value={task}
+                onChangeText={setTask}
+                placeholder="New task"
+                placeholderTextColor={colors.text}
+            />
+            <Button title="Add Task" onPress={handleAddTodo} />
         </View>
     );
 }
 
-const createStyles = (colors) => StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
-        backgroundColor: colors.background,
+        backgroundColor: '#fff',
     },
     todoContainer: {
-        marginBottom: 10,
+        flex: 1,
+        padding: 10,
+        backgroundColor: '#f0f0f0',
     },
-    text: {
-        color: colors.text,
+    todoBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 8,
+        marginBottom: 10,
+        backgroundColor: '#fff',
+    },
+    completeContainer: {
+        marginRight: 10,
+    },
+    taskContainer: {
+        flex: 1,
+        marginLeft: 10,
+    },
+    actionsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        marginLeft: 10,
+    },
+    input: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 10,
+        marginBottom: 10,
+        paddingHorizontal: 10,
+        color: '#000',
+    },
+    textTodo: {
+        color: '#000',
     },
 });
 
