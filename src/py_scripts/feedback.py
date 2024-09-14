@@ -49,5 +49,13 @@ def create_feedback():
     conn.close()
     return jsonify({'message': 'Feedback recieved'}), 201
 
+@app.route('/feedback/<int:id>', methods=['DELETE'])
+def delete_feedback(id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM feedback WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Feedback deleted'})
+
 if __name__ == '__main__':
     app.run(debug=True, port=4444)

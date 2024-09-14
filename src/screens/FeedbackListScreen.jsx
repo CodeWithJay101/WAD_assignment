@@ -3,7 +3,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, Alert, TextInput, Button } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
-import { getFeedbacks } from '../api/api';
+import { getFeedbacks, deleteFeedback } from '../api/api';
 import { createStyles } from '../styles/themeStyles';
 
 const CATEGORY_LABELS = {
@@ -50,6 +50,15 @@ export default function FeedbackListing() {
             Alert.alert('Authentication failed', 'Only Admins can view this page.');
         }
     };
+    const handleResolve = async (id) => {
+        try {
+            await deleteFeedback(id);
+            const data = await getFeedbacks();
+            setFeedbacks(data);
+        } catch (error) {
+            console.error('Error deleting feedback:', error);
+        }
+    };
 
     const handleLogout = () => {
         setIsAuthenticated(false);
@@ -62,6 +71,7 @@ export default function FeedbackListing() {
             <Text style={styles.label}>Email: {item.email}</Text>
             <Text style={styles.label}>Category: {CATEGORY_LABELS[item.category] || item.category}</Text>
             <Text style={styles.label}>Description: {item.description}</Text>
+            <Button title='Resolve' onPress={() => handleResolve(item.id)} />
         </View>
     );
 
