@@ -1,9 +1,7 @@
-// src/screens/TaskScreens.js
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
-import { createStyles } from '../styles/themeStyles';
 import { getTodos, createTodo, updateTodo, deleteTodo } from '../api/api';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
 
@@ -86,25 +84,27 @@ const TaskListScreen = ({ filter, title }) => {
 
     return (
         <View style={styles.container}>
-             <View>
+            {/* Uncomment this section for a back button and title */}
+            {/* <View>
                 <TouchableOpacity onPress={handleBackPress}>
                     <Icon name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
             </View>
-            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.title}>{title}</Text> */}
             <FlatList
                 data={filteredTodos}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
             />
-            <TextInput
+            {/* Uncomment this section for adding new tasks */}
+            {/* <TextInput
                 style={styles.input}
                 value={task}
                 onChangeText={setTask}
                 placeholder="New task"
                 placeholderTextColor={colors.text}
             />
-            <Button title="Add Task" onPress={handleAddTodo} />
+            <Button title="Add Task" onPress={handleAddTodo} /> */}
         </View>
     );
 };
@@ -130,10 +130,11 @@ export const DeletedTasksScreen = () => (
     />
 );
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
+        backgroundColor: colors.background,
     },
     todoBox: {
         flexDirection: 'row',
@@ -141,12 +142,13 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 10,
         borderRadius: 8,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: colors.card, 
         justifyContent: 'space-between',
     },
     text: {
         flex: 1,
         marginRight: 10,
+        color: colors.text, 
     },
     actionsContainer: {
         flexDirection: 'row',
@@ -157,13 +159,15 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 40,
-        borderColor: 'gray',
+        borderColor: colors.border, 
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 8,
+        color: colors.text, 
     },
     title: {
         fontSize: 24,
         marginBottom: 10,
+        color: colors.text, 
     },
 });
