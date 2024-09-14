@@ -21,6 +21,7 @@ const TodoStackNavigator = () => {
     >
       <Stack.Screen name="ToDo" component={HomeScreen} />
       <Stack.Screen name="EditTodoScreen" component={EditTodoScreen} />
+       <Stack.Screen name="AddTodoScreen" component={AddTodoScreen} /> 
     </Stack.Navigator>
   )
 };
