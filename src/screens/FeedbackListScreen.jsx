@@ -1,25 +1,21 @@
-// src/screens/FeedbackListScreen.js
-import React, { useCallback, useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, Alert, TextInput, Button } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, FlatList, ActivityIndicator, Alert, TextInput, Button } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
-import { getFeedbacks } from '../api/api';
-import { createStyles } from '../styles/themeStyles';
+import { getFeedbacks, deleteFeedback } from '../api/api';
 
 const CATEGORY_LABELS = {
     bug: 'Bug',
     improvement: 'Improvement',
     feature_request: 'Feature Request',
-}
+};
 
-export default function FeedbackListing() {
+export default function FeedbackListScreen() {
     const { colors } = useTheme();
-    const styles = createStyles(colors);
 
     const [feedbacks, setFeedbacks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,15 +35,29 @@ export default function FeedbackListing() {
                 }
             };
 
-            fetchFeedbacks();
+            if (isAuthenticated) {
+                fetchFeedbacks();
+            }
         }, [isAuthenticated])
     );
 
     const handleLogin = () => {
         if (username === 'admin' && password === 'admin') {
             setIsAuthenticated(true);
+            setError(null);
         } else {
             Alert.alert('Authentication failed', 'Only Admins can view this page.');
+        }
+    };
+
+    const handleResolve = async (id) => {
+        try {
+            await deleteFeedback(id);
+            const data = await getFeedbacks();
+            setFeedbacks(data);
+        } catch (error) {
+            console.error('Error deleting feedback:', error);
+            Alert.alert('Error', 'Failed to resolve feedback.');
         }
     };
 
@@ -55,99 +65,66 @@ export default function FeedbackListing() {
         setIsAuthenticated(false);
         setUsername('');
         setPassword('');
+        setFeedbacks([]);
     };
 
     const renderFeedbackItem = ({ item }) => (
-        <View style={styles.container}>
-            <Text style={styles.label}>Email: {item.email}</Text>
-            <Text style={styles.label}>Category: {CATEGORY_LABELS[item.category] || item.category}</Text>
-            <Text style={styles.label}>Description: {item.description}</Text>
+        <View style={{ padding: 15, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: colors.cardBackground, marginBottom: 10 }}>
+            <Text style={{ fontSize: 16, color: colors.text }}>Email: {item.email}</Text>
+            <Text style={{ fontSize: 16, color: colors.text }}>Category: {CATEGORY_LABELS[item.category] || item.category}</Text>
+            <Text style={{ fontSize: 16, color: colors.text }}>Description: {item.description}</Text>
+            <Button title="Resolve" onPress={() => handleResolve(item.id)} color="#007BFF" />
         </View>
     );
 
     if (!isAuthenticated) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.title}>Admins Only</Text>
+            <View style={{ flex: 1, padding: 16, backgroundColor: colors.background }}>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: colors.text }}>Admins Only</Text>
                 <TextInput
-                    style={styles.input}
+                    style={{ height: 40, borderColor: colors.border, borderWidth: 1, marginBottom: 10, paddingHorizontal: 8, color: colors.text }}
                     value={username}
                     onChangeText={setUsername}
                     placeholder="Username"
                     placeholderTextColor={colors.text}
                 />
                 <TextInput
-                    style={styles.input}
+                    style={{ height: 40, borderColor: colors.border, borderWidth: 1, marginBottom: 10, paddingHorizontal: 8, color: colors.text }}
                     value={password}
                     onChangeText={setPassword}
                     placeholder="Password"
                     secureTextEntry
                     placeholderTextColor={colors.text}
                 />
-                <Button title="Login" onPress={handleLogin} />
+                <Button title="Login" onPress={handleLogin} color="#007BFF" />
             </View>
         );
     }
 
     if (loading) {
-        return <ActivityIndicator size="large" color={colors.text}/>;
+        return <ActivityIndicator size="large" color={colors.text} />;
     }
 
     if (error) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.errorText}>{error}</Text>
+            <View style={{ flex: 1, padding: 16, backgroundColor: colors.background }}>
+                <Text style={{ color: 'red', fontSize: 16, textAlign: 'center' }}>{error}</Text>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Submitted Feedback</Text>
+        <View style={{ flex: 1, padding: 16, backgroundColor: colors.background }}>
+            <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: colors.text }}>Submitted Feedback</Text>
             <FlatList
                 data={feedbacks}
                 renderItem={renderFeedbackItem}
                 keyExtractor={(item) => item.id.toString()}
+                ListEmptyComponent={<Text style={{ fontSize: 16, color: colors.text, textAlign: 'center', marginTop: 20 }}>No feedback available</Text>}
             />
-        
-            <View style={styles.footer}>
-                <Button title="Logout" onPress={handleLogout} />
+            <View style={{ marginTop: 20, alignItems: 'center' }}>
+                <Button title="Logout" onPress={handleLogout} color="#FF0000" />
             </View>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#fff',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    item: {
-        padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-    },
-    email: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    category: {
-        fontSize: 16,
-    },
-    description: {
-        fontSize: 16,
-        marginTop: 5,
-    },
-    error: {
-        fontSize: 18,
-        color: 'red',
-        textAlign: 'center',
-        marginTop: 20,
-    },
-});
