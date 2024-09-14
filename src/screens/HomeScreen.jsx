@@ -34,6 +34,10 @@ export default function HomeScreen({ navigation }) {
     };
 
     const handleAddTodo = async () => {
+        if (!task.trim()) {
+            Alert.alert('Error', 'Task cannot be empty');
+            return;
+        }
         try {
             await createTodo({ task, completed: 0, starred: 0, deleted: 0 });
             setTask('');
