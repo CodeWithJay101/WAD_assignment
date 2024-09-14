@@ -1,54 +1,48 @@
-// src/screens/FeedbackScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, Alert } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
-import { createStyles } from '../styles/themeStyles';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { createFeedback } from '../api/api'; // Ensure you have this API method
 
 export default function FeedbackScreen() {
     const { colors } = useTheme();
-    const styles = createStyles(colors);
 
     const [email, setEmail] = useState('');
     const [description, setDescription] = useState('');
-    const [category, setCategory] = useState([
-        { label: 'Bug', value: 'bug' },
-        { label: 'Improvement', value: 'improvement' },
-        { label: 'Feature Request', value: 'feature_request' }
-    ]);
-
     const [open, setOpen] = useState(false);
     const [feedbackType, setFeedbackType] = useState(null);
 
-    // State to track validation errors
     const [errors, setErrors] = useState({
         email: false,
         category: false,
         description: false,
     });
 
+    const MIN_DESC_LENGTH = 10;
+    const MAX_DESC_LENGTH = 100;
+
     const handleSubmitFeedback = async () => {
-        //Reset errors
-        setErrors({ email: false, category: false, description: false })
+        setErrors({ email: false, category: false, description: false });
         let hasErrors = false;
 
-        //Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            setErrors((prev) => ({ ...prev, email: true }));
+            setErrors(prev => ({ ...prev, email: true }));
             hasErrors = true;
         }
 
-        // Check if fields are empty
         if (!feedbackType) {
-            setErrors((prev) => ({ ...prev, category: true }));
+            setErrors(prev => ({ ...prev, category: true }));
             hasErrors = true;
         }
 
-        if (!description.trim()) {
-            setErrors((prev) => ({ ...prev, description: true }));
+        if (!description.trim() || description.length < MIN_DESC_LENGTH || description.length > MAX_DESC_LENGTH) {
+            setErrors(prev => ({ ...prev, description: true }));
             hasErrors = true;
+            const errorMessage = description.length < MIN_DESC_LENGTH
+                ? `Description must be at least ${MIN_DESC_LENGTH} characters long.`
+                : `Description must be less than ${MAX_DESC_LENGTH} characters long.`;
+            Alert.alert('Error', errorMessage);
         }
 
         if (hasErrors) {
@@ -59,7 +53,7 @@ export default function FeedbackScreen() {
         try {
             await createFeedback({ email, category: feedbackType, description });
             setEmail('');
-            setFeedbackType(null); //Reset feedbackType
+            setFeedbackType(null);
             setDescription('');
             Alert.alert('Success', 'Feedback submitted successfully!');
         } catch (error) {
@@ -69,10 +63,17 @@ export default function FeedbackScreen() {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.label}>Email</Text>
+        <View style={{ flex: 1, padding: 16, backgroundColor: colors.background }}>
+            <Text style={{ fontSize: 16, color: colors.text, marginBottom: 8 }}>Email</Text>
             <TextInput
-                style={[styles.input, errors.email && styles.errorInput]}
+                style={[{
+                    height: 40,
+                    borderColor: errors.email ? 'red' : colors.border,
+                    borderWidth: 1,
+                    marginBottom: 10,
+                    paddingHorizontal: 8,
+                    color: colors.text,
+                }, errors.email && { borderColor: 'red' }]}
                 placeholder="Enter your email"
                 keyboardType="email-address"
                 value={email}
@@ -80,9 +81,9 @@ export default function FeedbackScreen() {
                 autoCompleteType="email"
                 placeholderTextColor={colors.text}
             />
-            {errors.email && <Text style={styles.errorText}>Invalid email address</Text>}
+            {errors.email && <Text style={{ color: 'red', fontSize: 12, marginBottom: 10 }}>Invalid email address</Text>}
 
-            <Text style={styles.label}>Feedback Type</Text>
+            <Text style={{ fontSize: 16, color: colors.text, marginBottom: 8 }}>Feedback Type</Text>
             <DropDownPicker
                 open={open}
                 value={feedbackType}
@@ -99,11 +100,18 @@ export default function FeedbackScreen() {
                 placeholder="Select feedback type"
                 containerStyle={{ marginBottom: 20 }}
             />
-            {errors.category && <Text style={styles.errorText}>Category is required</Text>}
+            {errors.category && <Text style={{ color: 'red', fontSize: 12, marginBottom: 10 }}>Category is required</Text>}
 
-            <Text style={styles.label}>Description</Text>
+            <Text style={{ fontSize: 16, color: colors.text, marginBottom: 8 }}>Description</Text>
             <TextInput
-                style={[styles.input, styles.textArea, errors.description && styles.errorInput]}
+                style={[{
+                    height: 100,
+                    borderColor: errors.description ? 'red' : colors.border,
+                    borderWidth: 1,
+                    marginBottom: 10,
+                    paddingHorizontal: 8,
+                    color: colors.text,
+                }, errors.description && { borderColor: 'red' }]}
                 placeholder="Enter feedback description"
                 multiline
                 numberOfLines={5}
@@ -112,9 +120,10 @@ export default function FeedbackScreen() {
                 textAlignVertical="top"
                 placeholderTextColor={colors.text}
             />
-            {errors.description && <Text style={styles.errorText}>Description is required</Text>}
+            {errors.description && <Text style={{ color: 'red', fontSize: 12, marginBottom: 10 }}>Description is required</Text>}
 
             <Button title="Submit Feedback" onPress={handleSubmitFeedback} color="#007BFF" />
         </View>
     );
 }
+
