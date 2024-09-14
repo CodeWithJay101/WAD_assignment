@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { createStyles } from '../styles/themeStyles';
-
+import ChatBubble from 'react-native-chat-bubble';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import io from 'socket.io-client';
 
@@ -33,7 +33,17 @@ export default function ChatScreen() {
         <View style={styles.container}>
             <FlatList
                 data={messages}
-                renderItem={({ item }) => <Text style={styles.text}>{item}</Text>}
+                renderItem={({ item }) =>
+                    <ChatBubble
+                        isOwnMessage={true}
+                        bubbleColor='#1084ff'
+                        tailColor='#1084ff'
+                        withTail={true}
+                        onPress={() => console.log("Bubble Pressed!")}
+                    >
+                        <Text style={ styles.text}>{item}</Text>
+                    </ChatBubble>
+                }
                 keyExtractor={(item, index) => index.toString()}
             />
             <TextInput
