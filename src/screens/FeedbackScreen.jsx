@@ -28,6 +28,9 @@ export default function FeedbackScreen() {
         description: false,
     });
 
+    const MIN_DESC_LENGTH = 10; // Minimum length for description
+    const MAX_DESC_LENGTH = 100; // Maximum length for description
+
     const handleSubmitFeedback = async () => {
         //Reset errors
         setErrors({ email: false, category: false, description: false })
@@ -48,6 +51,14 @@ export default function FeedbackScreen() {
 
         if (!description.trim()) {
             setErrors((prev) => ({ ...prev, description: true }));
+            hasErrors = true;
+        } else if (description.length < MIN_DESC_LENGTH) {
+            setErrors((prev) => ({ ...prev, description: true }));
+            Alert.alert('Error', `Description must be at least ${MIN_DESC_LENGTH} characters long.`);
+            hasErrors = true;
+        } else if (description.length > MAX_DESC_LENGTH) {
+            setErrors((prev) => ({ ...prev, description: true }));
+            Alert.alert('Error', `Description must be less than ${MAX_DESC_LENGTH} characters long.`);
             hasErrors = true;
         }
 
