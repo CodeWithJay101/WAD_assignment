@@ -11,6 +11,7 @@ import NotesScreen from './src/screens/NotesScreen';
 import { CompletedTasksScreen, StarredTasksScreen, DeletedTasksScreen } from './src/screens/TaskScreens';
 
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
+import CalendarScreen from './src/screens/CalendarScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -46,6 +47,7 @@ const AppNavigator = () => {
       <Drawer.Screen name="Feedback" component={FeedbackScreen} />
       <Drawer.Screen name="Feedback Listing" component={FeedbackListingScreen} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
+      <Drawer.Screen name="Calendar" component={CalendarScreen} />
     </Drawer.Navigator>
   );
 }
