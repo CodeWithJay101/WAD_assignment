@@ -20,9 +20,6 @@ def init_db():
             id INTEGER PRIMARY KEY, 
             note TEXT
         );
-        -- Ensure only one row
-        DELETE FROM notes;
-        INSERT INTO notes (id, note) VALUES (1, ''); 
     ''')
     conn.commit()
     conn.close()

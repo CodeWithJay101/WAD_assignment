@@ -1,6 +1,6 @@
 // src/screens/NotesScreen.jsx
 import React, { useCallback, useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { createStyles } from '../styles/themeStyles';
@@ -13,6 +13,7 @@ export default function NotesScreen() {
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [hasNote, setHasNote] = useState(false);  // To track if a note exists or not
 
     useFocusEffect(
         useCallback(() => {
@@ -20,8 +21,11 @@ export default function NotesScreen() {
                 try {
                     setLoading(true);
                     const data = await getNote();
-                    if (data.note) {
+                    if (data && data.note) {
                         setNote(data.note); // Initialize the note with the fetched note
+                        setHasNote(true);    // Note exists, proceed to UI
+                    } else {
+                        setHasNote(false);   // No note found, show start button
                     }
                 } catch (error) {
                     setError('Failed to load note');
@@ -34,6 +38,19 @@ export default function NotesScreen() {
             fetchNote();
         }, [])
     );
+
+    const handleCreateNote = async () => {
+        try {
+            setLoading(true);
+            await createNote('');  // Create an empty note in the database
+            setHasNote(true);      // Switch to note-editing UI
+        } catch (error) {
+            console.error('Error creating note:', error);
+            Alert.alert('Error', 'An error occurred while creating the note.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleUpdateNote = async () => {
         if (!note.trim()) {
@@ -62,6 +79,16 @@ export default function NotesScreen() {
         );
     }
 
+    // If no note exists, show a button to start taking notes
+    if (!hasNote) {
+        return (
+            <View style={styles.container}>
+                <Button title="Start Taking Notes" onPress={handleCreateNote} />
+            </View>
+        );
+    }
+
+    // If a note exists, proceed with the regular note UI
     return (
         <View style={styles.container}>
             <TextInput
@@ -77,4 +104,3 @@ export default function NotesScreen() {
         </View>
     );
 }
-
