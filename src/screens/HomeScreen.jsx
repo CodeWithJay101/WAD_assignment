@@ -1,4 +1,3 @@
-// src/HomeScreen.js
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';

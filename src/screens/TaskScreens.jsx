@@ -1,11 +1,10 @@
-// src/screens/TaskScreens.js
 import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { createStyles } from '../styles/themeStyles';
 import { getTodos, createTodo, updateTodo, deleteTodo } from '../api/api';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const TaskListScreen = ({ filter, title }) => {
     const { colors } = useTheme();
@@ -86,25 +85,11 @@ const TaskListScreen = ({ filter, title }) => {
 
     return (
         <View style={styles.container}>
-             {/* <View>
-                <TouchableOpacity onPress={handleBackPress}>
-                    <Icon name="arrow-back" size={24} color={colors.text} />
-                </TouchableOpacity>
-            </View>
-            <Text style={styles.title}>{title}</Text> */}
             <FlatList
                 data={filteredTodos}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
             />
-            {/* <TextInput
-                style={styles.input}
-                value={task}
-                onChangeText={setTask}
-                placeholder="New task"
-                placeholderTextColor={colors.text}
-            />
-            <Button title="Add Task" onPress={handleAddTodo} /> */}
         </View>
     );
 };

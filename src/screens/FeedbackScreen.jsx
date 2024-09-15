@@ -1,4 +1,3 @@
-// src/screens/FeedbackScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';

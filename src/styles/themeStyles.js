@@ -1,4 +1,3 @@
-//src/styles/themeStyles.js
 import { StyleSheet } from 'react-native';
 
 export const createStyles = (colors) => StyleSheet.create({

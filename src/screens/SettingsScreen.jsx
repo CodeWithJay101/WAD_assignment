@@ -1,4 +1,3 @@
-// src/screens/SettingsScreen.js
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';

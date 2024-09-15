@@ -1,4 +1,3 @@
-// src/screens/NotesScreen.jsx
 import React, { useCallback, useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';

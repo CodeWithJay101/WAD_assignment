@@ -1,4 +1,3 @@
-// src/screens/FeedbackListScreen.js
 import React, { useCallback, useState, useEffect } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, Alert, TextInput, Button } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
